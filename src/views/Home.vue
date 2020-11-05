@@ -1,7 +1,13 @@
 <template>
   <v-main>
     <v-container fill-height fluid>
-      <div class="background" :style="{ backgroundImage: 'url(' + image + ')' }"/>
+      <transition name="fade" mode="out-in">
+        <div
+            class="background"
+            :style="{ backgroundImage: 'url(' + image + ')' }"
+            :key="image"
+        />
+      </transition>
       <MusicPlayer
           :status="music_playing"
           :music="musics[index_playing]"
@@ -159,5 +165,11 @@ export default {
   background-size: cover;
   background-position: center;
   filter: blur(1rem);
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .3s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 </style>

@@ -6,10 +6,16 @@
           max-width="400"
           elevation="15"
       >
-        <v-img
-            max-height="256"
-            :src="music.image"
-        />
+        <div style="height: 224px; border-radius: 4px;">
+          <transition name="fade">
+            <v-img
+                class="image"
+                height="224"
+                :src="music.image"
+                :key="music.title"
+            />
+          </transition>
+        </div>
 
         <v-card-text class="text--primary">
           <div>{{ music.title }}</div>
@@ -144,5 +150,16 @@ export default {
 </script>
 
 <style scoped>
-
+.image {
+  position: absolute;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: .3s ease;
+}
+.fade-enter {
+  transform: translate(-100%) scale(.2);
+}
+.fade-leave-to {
+  transform: translate(100%) scale(.2);
+}
 </style>
