@@ -5,26 +5,43 @@
           class="mx-auto"
           max-width="400"
           elevation="15"
+          style="margin-bottom: 100px;"
       >
         <div style="height: 224px; border-radius: 4px;">
-          <transition name="fade">
+          <transition :name="nextTrack ? 'to-right' : 'to-left'">
             <v-img
                 class="image"
                 height="224"
                 :src="music.image"
                 :key="music.title"
+                style="border-radius: 4px"
             />
           </transition>
         </div>
 
-        <v-card-text class="text--primary">
-          <div>{{ music.title }}</div>
+        <v-btn
+            absolute
+            top
+            right
+            icon
+            @click="music.liked ? $emit('unlike') : $emit('like')"
+        >
+          <transition name="like">
+            <v-icon class="like-btn" key="like" v-if="music.liked">mdi-heart</v-icon>
+            <v-icon class="like-btn" key="unlike" v-else>mdi-heart-outline</v-icon>
+          </transition>
+        </v-btn>
+
+        <v-card-text class="text-left text--primary">
+          <div class="text-h6">{{ music.title }}</div>
+          <div class="caption grey--text">{{ music.author }}</div>
+          <div v-if="music.feat.length" class="caption grey--text">ft. {{ music.feat.join(', ') }}</div>
         </v-card-text>
 
         <v-card-actions class="justify-center">
           <v-row>
             <v-col cols="12" md="6" class="px-0">
-              <v-btn color="primary" text @click="$emit('previous')">
+              <v-btn color="primary" text @click="previous">
                 <v-icon>mdi-skip-previous</v-icon>
               </v-btn>
 
@@ -38,7 +55,7 @@
                 <v-icon>mdi-pause</v-icon>
               </v-btn>
 
-              <v-btn color="primary" text @click="$emit('next')">
+              <v-btn color="primary" text @click="next">
                 <v-icon>mdi-skip-next</v-icon>
               </v-btn>
             </v-col>
@@ -72,6 +89,20 @@
           />
           {{ duration|formatTime }}
         </v-card-actions>
+
+        <v-btn
+            class="mx-auto"
+            absolute
+            fab
+            left
+            right
+            large
+            color="primary"
+            style="bottom: -80px"
+            @click="$emit('open-drawer')"
+        >
+          <v-icon large>mdi-music</v-icon>
+        </v-btn>
       </v-card>
     </v-col>
   </v-row>
@@ -111,6 +142,8 @@ export default {
       mouse_down: false,
       seek_time: 0,
       seek_sent: true,
+      nextTrack: true,
+      shortcuts_event: undefined,
     }
   },
   computed: {
@@ -119,6 +152,17 @@ export default {
     },
   },
   methods: {
+    previous() {
+      this.nextTrack = false;
+      this.$emit('previous');
+      setTimeout(() => {
+        this.nextTrack = true;
+      }, 100);
+    },
+    next() {
+      this.nextTrack = true;
+      this.$emit('next');
+    },
     mouseDown() {
       this.mouse_down = true;
       this.seek_sent = false;
@@ -146,6 +190,38 @@ export default {
       return `${min}:${sec}`
     },
   },
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.shortcuts_event);
+  },
+  mounted() {
+    this.shortcuts_event = document.body.addEventListener('keydown', (ev) => {
+      if (ev.shiftKey && ev.ctrlKey && ev.code === 'ArrowRight') {
+        this.mouse_down = false;
+        this.seek_sent = false;
+        this.seek_time = this.currentTime + 5;
+        this.seek(this.seek_time);
+      } else if (ev.shiftKey && ev.ctrlKey && ev.code === 'ArrowLeft') {
+        this.mouse_down = false;
+        this.seek_sent = false;
+        this.seek_time = this.currentTime - 5;
+        this.seek(this.seek_time);
+      } else if (ev.ctrlKey && ev.code === 'ArrowRight') {
+        this.next();
+      } else if (ev.ctrlKey && ev.code === 'ArrowLeft') {
+        this.previous();
+      } else if (ev.ctrlKey && ev.code === 'ArrowDown') {
+        const volume = this.volume - Math.min(this.volume, 0.1);
+        this.$emit('volumechange', volume);
+      } else if (ev.ctrlKey && ev.code === 'ArrowUp') {
+        const volume = this.volume + Math.min(1 - this.volume, 0.1);
+        this.$emit('volumechange', volume);
+      } else if (ev.ctrlKey && ev.code === 'Space') {
+        if (this.status === -1) this.$emit('start');
+        else if (this.status === 0) this.$emit('resume');
+        else if (this.status === 1) this.$emit('pause');
+      }
+    })
+  },
 }
 </script>
 
@@ -153,13 +229,43 @@ export default {
 .image {
   position: absolute;
 }
-.fade-enter-active, .fade-leave-active {
+
+.to-left-enter-active, .to-left-leave-active,
+.to-right-enter-active, .to-right-leave-active {
   transition: .3s ease;
 }
-.fade-enter {
+
+.to-left-enter {
+  transform: translate(100%) scale(.2);
+}
+
+.to-left-leave-to {
   transform: translate(-100%) scale(.2);
 }
-.fade-leave-to {
+
+.to-right-enter {
+  transform: translate(-100%) scale(.2);
+}
+
+.to-right-leave-to {
   transform: translate(100%) scale(.2);
+}
+
+.like-btn {
+  position: absolute;
+}
+
+.like-enter-active, .like-leave-active {
+  transition: .3s ease;
+}
+
+.like-enter {
+  opacity: 0;
+  transform: rotate(-135deg) scale(.3);
+}
+
+.like-leave-to {
+  opacity: 0;
+  transform: rotate(135deg) scale(.3);
 }
 </style>

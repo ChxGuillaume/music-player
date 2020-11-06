@@ -10,7 +10,7 @@
       </transition>
       <MusicPlayer
           :status="music_playing"
-          :music="musics[index_playing]"
+          :music="playingMusic"
           :volume="volume"
           :duration="duration"
           :currentTime="current_time"
@@ -21,8 +21,18 @@
           @previous="previous"
           @next="next"
           @seeking="seeking"
+          @like="like"
+          @unlike="unlike"
+          @open-drawer="$refs.drawer.toggleMenu()"
       />
       <MusicShortcuts/>
+      <MusicDrawer
+          :likes="likes"
+          :index_playing="index_playing"
+          :musics="musics"
+          ref="drawer"
+          @select-music="selectMusic"
+      />
     </v-container>
   </v-main>
 </template>
@@ -30,31 +40,43 @@
 <script>
 import MusicPlayer from "../components/MusicPlayer.vue";
 import MusicShortcuts from "../components/MusicShortcuts.vue";
+import MusicDrawer from "../components/MusicDrawer.vue";
 
 export default {
   name: 'Home',
   components: {
+    MusicDrawer,
     MusicShortcuts,
     MusicPlayer,
   },
   data() {
     return {
       index_playing: 0,
+      likes: [],
       musics: [
         {
-          title: 'K/DA - MORE, avec Madison Beer, (G)I-DLE, Lexie Liu, Jaira Burns, Séraphine',
+          id: 1,
+          title: 'MORE',
           image: require('../assets/musics/images/KDA_MORE.jpg'),
           mp3: require('../assets/musics/KDA_MORE.mp3'),
+          author: 'K/DA',
+          feat: ['Madison Beer', '(G)I-DLE', 'Lexie Liu', 'Jaira Burns', 'Seraphine'],
         },
         {
-          title: 'K/DA - THE BADDEST ft. (G)I-DLE, Bea Miller, Wolftyla (clip officiel de paroles)',
+          id: 2,
+          title: 'THE BADDEST',
           image: require('../assets/musics/images/KDA_BADDEST.jpg'),
           mp3: require('../assets/musics/KDA_BADDEST.mp3'),
+          author: 'K/DA',
+          feat: ['(G)I-DLE', 'Bea Miller', 'Wolftyla'],
         },
         {
-          title: 'K/DA - POP/STARS (ft. Madison Beer, (G)I-DLE, Jaira Burns)',
+          id: 3,
+          title: 'POP/STARS',
           image: require('../assets/musics/images/KDA_POP_STARS.jpg'),
           mp3: require('../assets/musics/KDA_POP_STARS.mp3'),
+          author: 'K/DA',
+          feat: ['Madison Beer', '(G)I-DLE', 'Jaira Burns'],
         },
       ],
       music: new Audio(),
@@ -62,7 +84,7 @@ export default {
       volume: 1,
       duration: 1,
       current_time: 0,
-      shortcuts_event: undefined,
+      menu: false,
     }
   },
   computed: {
@@ -70,8 +92,12 @@ export default {
       return this.playingMusic.image;
     },
     playingMusic() {
-      return this.musics[this.index_playing];
-    }
+      const music = this.musics[this.index_playing];
+      return {
+        ...music,
+        liked: this.likes.includes(music.id),
+      };
+    },
   },
   methods: {
     initMusic() {
@@ -83,9 +109,11 @@ export default {
       this.music.play();
       this.duration = this.music.duration;
 
-      this.music.addEventListener('ended', this.next);
-
       this.music_playing = 1;
+    },
+    selectMusic(id) {
+      this.index_playing = this.musics.indexOf(this.musics.find(e => e.id === id)) || 0;
+      this.initMusic();
     },
     resume() {
       this.music.play();
@@ -113,10 +141,16 @@ export default {
     seeking(seek) {
       if (this.music) this.music.currentTime = seek;
     },
+    like() {
+      if (!this.likes.includes(this.playingMusic.id)) this.likes.push(this.playingMusic.id)
+    },
+    unlike() {
+      const index = this.likes.indexOf(this.playingMusic.id);
+      this.likes.splice(index, 1);
+    },
   },
   beforeDestroy() {
     if (this.music) this.music.pause();
-    document.removeEventListener('keydown', this.shortcuts_event);
   },
   mounted() {
     this.music.addEventListener('volumechange', () => {
@@ -126,31 +160,11 @@ export default {
     this.music.addEventListener('timeupdate', () => {
       this.duration = Math.round(this.music.duration) || 0;
       this.current_time = this.music.currentTime;
-    })
+    });
 
-    this.shortcuts_event = document.body.addEventListener('keydown', (ev) => {
-      if (ev.shiftKey && ev.ctrlKey && ev.code === 'ArrowRight') {
-        if (this.music) {
-          this.music.currentTime += 5;
-        }
-      } else if (ev.shiftKey && ev.ctrlKey && ev.code === 'ArrowLeft') {
-        if (this.music) {
-          this.music.currentTime -= 5;
-        }
-      } else if (ev.ctrlKey && ev.code === 'ArrowRight') {
-        this.next()
-      } else if (ev.ctrlKey && ev.code === 'ArrowLeft') {
-        this.previous()
-      } else if (ev.ctrlKey && ev.code === 'ArrowDown') {
-        if (this.music && this.music.volume > 0) this.music.volume -= Math.min(this.music.volume, 0.1);
-      } else if (ev.ctrlKey && ev.code === 'ArrowUp') {
-        if (this.music && this.music.volume < 1) this.music.volume += Math.min(1 - this.music.volume, 0.1);
-      } else if (ev.ctrlKey && ev.code === 'Space') {
-        if (this.music_playing === -1) this.initMusic();
-        else if (this.music_playing === 0) this.resume();
-        else if (this.music_playing === 1) this.pause();
-      }
-    })
+    this.music.addEventListener('ended', this.next);
+
+    this.music.volume = 0.2;
   },
 }
 </script>
@@ -166,10 +180,38 @@ export default {
   background-position: center;
   filter: blur(1rem);
 }
+
 .fade-enter-active, .fade-leave-active {
   transition: opacity .3s;
 }
+
 .fade-enter, .fade-leave-to {
   opacity: 0;
+}
+
+.scrolling-text {
+  width: fit-content;
+  min-width: 100%;
+  text-align: left;
+  transition: .5s linear;
+}
+
+.scrolling-text-container:hover .scrolling-text {
+  animation: linear scroll-text 8s infinite;
+}
+
+@keyframes scroll-text {
+  0% {
+    transform: translate(0%);
+  }
+  55% {
+    transform: translate(-100%);
+  }
+  55.01% {
+    transform: translate(100%);
+  }
+  75% {
+    transform: translate(0%);
+  }
 }
 </style>
