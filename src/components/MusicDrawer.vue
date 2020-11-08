@@ -20,29 +20,25 @@
         dense
         nav
     >
-      <v-list-item-group
-          :value="index_playing"
-          color="primary"
-          mandatory
+      <v-list-item
+          :class="{ playing: item.id === music_id }"
+          v-for="(item) in displayMusics"
+          :key="item.id"
+          link
+          @click="$emit('select-music', item.id)"
+          @click.right="chooseMusic($event, item.id)"
       >
-        <v-list-item
-            v-for="(item) in displayMusics"
-            :key="item.id"
-            link
-            @click="$emit('select-music', item.id)"
-        >
-          <v-list-item-icon class="mr-2">
-            <v-icon>mdi-music-note-eighth</v-icon>
-          </v-list-item-icon>
+        <v-list-item-icon class="mr-2">
+          <v-icon :color="item.id === music_id ? 'primary' : ''">mdi-music-note-eighth</v-icon>
+        </v-list-item-icon>
 
-          <v-list-item-content class="scrolling-text-container">
-            <v-list-item-title class="scrolling-text">
-              <div>{{ item.title }} <span class="grey--text">by {{ item.author }}</span></div>
-              <div class="grey--text">ft. {{ item.feat.join(', ') }}</div>
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list-item-group>
+        <v-list-item-content class="scrolling-text-container">
+          <v-list-item-title class="scrolling-text">
+            <div>{{ item.title }} <span class="grey--text">by {{ item.author }}</span></div>
+            <div class="grey--text" v-if="item.feat.length">ft. {{ item.feat.join(', ') }}</div>
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
     </v-list>
 
     <template v-slot:append>
@@ -85,7 +81,7 @@ export default {
       type: Array,
       required: true,
     },
-    index_playing: {
+    music_id: {
       type: Number,
       required: true,
     },
@@ -93,7 +89,7 @@ export default {
   data() {
     return {
       menu: false,
-      sub_menu: undefined
+      sub_menu: undefined,
     }
   },
   computed: {
@@ -111,16 +107,22 @@ export default {
       }
 
       return this.musics
-    }
+    },
   },
   methods: {
     toggleMenu() {
       this.menu = !this.menu;
+    },
+    chooseMusic(ev, id) {
+      ev.preventDefault();
+      this.$emit('select-music', id);
     },
   },
 }
 </script>
 
 <style scoped>
-
+.playing {
+  background: rgba(33, 150, 243, .24);
+}
 </style>

@@ -2,6 +2,7 @@
   <v-row class="my-auto">
     <v-col>
       <v-card
+          :loading="loading"
           class="mx-auto"
           max-width="400"
           elevation="15"
@@ -48,10 +49,22 @@
               <v-btn color="primary" text @click="$emit('start')" v-if="status === -1">
                 <v-icon>mdi-play-pause</v-icon>
               </v-btn>
-              <v-btn color="primary" text @click="$emit('resume')" v-else-if="status === 0">
+              <v-btn
+                  :loading="loading"
+                  color="primary"
+                  text
+                  @click="$emit('resume')"
+                  v-else-if="status === 0"
+              >
                 <v-icon>mdi-play</v-icon>
               </v-btn>
-              <v-btn color="primary" text @click="$emit('pause')" v-else>
+              <v-btn
+                  :loading="loading"
+                  color="primary"
+                  text
+                  @click="$emit('pause')"
+                  v-else
+              >
                 <v-icon>mdi-pause</v-icon>
               </v-btn>
 
@@ -91,17 +104,14 @@
         </v-card-actions>
 
         <v-btn
-            class="mx-auto"
-            absolute
-            fab
-            left
-            right
-            large
+            text
+            height="48px"
+            width="100%"
             color="primary"
-            style="bottom: -80px"
             @click="$emit('open-drawer')"
         >
-          <v-icon large>mdi-music</v-icon>
+          <v-icon left>mdi-music</v-icon>
+          My Music
         </v-btn>
       </v-card>
     </v-col>
@@ -134,6 +144,10 @@ export default {
     },
     music: {
       type: Object,
+      required: true,
+    },
+    loading: {
+      type: Boolean,
       required: true,
     },
   },

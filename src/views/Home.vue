@@ -7,6 +7,14 @@
             :style="{ backgroundImage: 'url(' + image + ')' }"
             :key="image"
         />
+        <!-- Background Youtube IDEA -->
+        <!-- <iframe width="560" height="315"-->
+        <!--         src="https://www.youtube.com/embed/3VTkBuxU4yk?autoplay=1&controls=0&mute=1"-->
+        <!--         frameborder="0"-->
+        <!--         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"-->
+        <!--         allowfullscreen-->
+        <!--         style="z-index: 100"-->
+        <!-- />-->
       </transition>
       <MusicPlayer
           :status="music_playing"
@@ -14,6 +22,7 @@
           :volume="volume"
           :duration="duration"
           :currentTime="current_time"
+          :loading="music_loading"
           @start="initMusic"
           @resume="resume"
           @pause="pause"
@@ -28,8 +37,8 @@
       <MusicShortcuts/>
       <MusicDrawer
           :likes="likes"
-          :index_playing="index_playing"
           :musics="musics"
+          :music_id="playingMusic.id"
           ref="drawer"
           @select-music="selectMusic"
       />
@@ -57,30 +66,103 @@ export default {
         {
           id: 1,
           title: 'MORE',
-          image: require('../assets/musics/images/KDA_MORE.jpg'),
-          mp3: require('../assets/musics/KDA_MORE.mp3'),
+          image: 'https://songs.nekotiki.fr/thumbnails/KDA_MORE.jpg',
+          mp3: 'https://songs.nekotiki.fr/musics/KDA_MORE.mp3',
           author: 'K/DA',
           feat: ['Madison Beer', '(G)I-DLE', 'Lexie Liu', 'Jaira Burns', 'Seraphine'],
         },
         {
           id: 2,
           title: 'THE BADDEST',
-          image: require('../assets/musics/images/KDA_BADDEST.jpg'),
-          mp3: require('../assets/musics/KDA_BADDEST.mp3'),
+          image: 'https://songs.nekotiki.fr/thumbnails/KDA_BADDEST.jpg',
+          mp3: 'https://songs.nekotiki.fr/musics/KDA_BADDEST.mp3',
           author: 'K/DA',
           feat: ['(G)I-DLE', 'Bea Miller', 'Wolftyla'],
         },
         {
           id: 3,
           title: 'POP/STARS',
-          image: require('../assets/musics/images/KDA_POP_STARS.jpg'),
-          mp3: require('../assets/musics/KDA_POP_STARS.mp3'),
+          image: 'https://songs.nekotiki.fr/thumbnails/KDA_POP_STARS.jpg',
+          mp3: 'https://songs.nekotiki.fr/musics/KDA_POP_STARS.mp3',
           author: 'K/DA',
           feat: ['Madison Beer', '(G)I-DLE', 'Jaira Burns'],
+        },
+        {
+          id: 4,
+          title: 'WARRIORS',
+          image: 'https://songs.nekotiki.fr/thumbnails/WARRIORS.jpg',
+          mp3: 'https://songs.nekotiki.fr/musics/WARRIORS.mp3',
+          author: 'League of Legends',
+          feat: ['Imagine Dragons'],
+        },
+        {
+          id: 5,
+          title: 'RISE',
+          image: 'https://songs.nekotiki.fr/thumbnails/RISE.jpg',
+          mp3: 'https://songs.nekotiki.fr/musics/RISE.mp3',
+          author: 'League of Legends',
+          feat: ['The Glitch Mob', 'Mako', 'The Word Alive'],
+        },
+        {
+          id: 6,
+          title: 'LEGENDS NEVER DIE',
+          image: 'https://songs.nekotiki.fr/thumbnails/LEGENDS_NEVER_DIE.jpg',
+          mp3: 'https://songs.nekotiki.fr/musics/LEGENDS_NEVER_DIE.mp3',
+          author: 'League of Legends',
+          feat: ['Against The Current'],
+        },
+        {
+          id: 7,
+          title: 'TRUE DAMAGE GIANTS',
+          image: 'https://songs.nekotiki.fr/thumbnails/TRUE_DAMAGE_GIANTS.jpg',
+          mp3: 'https://songs.nekotiki.fr/musics/TRUE_DAMAGE_GIANTS.mp3',
+          author: 'League of Legends',
+          feat: ['Becky G', 'Keke Palmer', 'SOYEON', 'DUCKWRTH', 'Thutmose'],
+        },
+        {
+          id: 8,
+          title: 'GET JINXED',
+          image: 'https://songs.nekotiki.fr/thumbnails/GET_JINXED.jpg',
+          mp3: 'https://songs.nekotiki.fr/musics/GET_JINXED.mp3',
+          author: 'League of Legends',
+          feat: [],
+        },
+        {
+          id: 9,
+          title: 'PHOENIX',
+          image: 'https://songs.nekotiki.fr/thumbnails/PHOENIX.jpg',
+          mp3: 'https://songs.nekotiki.fr/musics/PHOENIX.mp3',
+          author: 'League of Legends',
+          feat: ['Cailin Russo', 'Chrissy Costanza'],
+        },
+        {
+          id: 10,
+          title: 'IGNITE',
+          image: 'https://songs.nekotiki.fr/thumbnails/IGNITE.jpg',
+          mp3: 'https://songs.nekotiki.fr/musics/IGNITE.mp3',
+          author: 'League of Legends',
+          feat: ['Zedd'],
+        },
+        {
+          id: 11,
+          title: 'AWAKEN',
+          image: 'https://songs.nekotiki.fr/thumbnails/AWAKEN.jpg',
+          mp3: 'https://songs.nekotiki.fr/musics/AWAKEN.mp3',
+          author: 'League of Legends',
+          feat: ['Valerie Broussard'],
+        },
+        {
+          id: 12,
+          title: 'WARRIORS',
+          image: 'https://songs.nekotiki.fr/thumbnails/WARRIORS_CINEMATIC.jpg',
+          mp3: 'https://songs.nekotiki.fr/musics/WARRIORS_CINEMATIC.mp3',
+          author: 'League of Legends',
+          feat: ['2WEI', 'Edda Hayes'],
         },
       ],
       music: new Audio(),
       music_playing: -1,
+      music_loading: false,
       volume: 1,
       duration: 1,
       current_time: 0,
@@ -110,6 +192,7 @@ export default {
       this.duration = this.music.duration;
 
       this.music_playing = 1;
+      this.music_loading = true;
     },
     selectMusic(id) {
       this.index_playing = this.musics.indexOf(this.musics.find(e => e.id === id)) || 0;
@@ -142,11 +225,16 @@ export default {
       if (this.music) this.music.currentTime = seek;
     },
     like() {
-      if (!this.likes.includes(this.playingMusic.id)) this.likes.push(this.playingMusic.id)
+      if (!this.likes.includes(this.playingMusic.id)) this.likes.push(this.playingMusic.id);
+      this.saveLikes();
     },
     unlike() {
       const index = this.likes.indexOf(this.playingMusic.id);
       this.likes.splice(index, 1);
+      this.saveLikes();
+    },
+    saveLikes() {
+      localStorage.setItem('liked_songs', JSON.stringify(this.likes));
     },
   },
   beforeDestroy() {
@@ -162,9 +250,23 @@ export default {
       this.current_time = this.music.currentTime;
     });
 
+    this.music.addEventListener('loadeddata', () => {
+      this.music_loading = false;
+    });
+
+    this.music.addEventListener('play', () => {
+      this.music_playing = 1;
+    });
+
+    this.music.addEventListener('pause', () => {
+      this.music_playing = 0;
+    });
+
     this.music.addEventListener('ended', this.next);
 
     this.music.volume = 0.2;
+
+    this.likes = JSON.parse(localStorage.getItem('liked_songs')) || [];
   },
 }
 </script>
