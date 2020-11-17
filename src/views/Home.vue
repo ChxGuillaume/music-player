@@ -184,6 +184,8 @@ export default {
           feat: ['TWICE', 'Bekuh BOOM', 'Annika Wells'],
         },
       ],
+      playing_list: [],
+      played_list: [],
       music: new Audio(),
       music_playing: -1,
       music_loading: false,
@@ -219,7 +221,13 @@ export default {
       this.music_loading = true;
     },
     selectMusic(id) {
-      this.index_playing = this.musics.indexOf(this.musics.find(e => e.id === id)) || 0;
+      const music_index = this.musics.indexOf(this.musics.find(e => e.id === id));
+
+      if (music_index > -1) {
+        this.played_list.push(this.playingMusic.id);
+        this.index_playing = music_index;
+      }
+
       this.initMusic();
     },
     resume() {
@@ -231,14 +239,18 @@ export default {
       this.music_playing = 0;
     },
     previous() {
-      if (this.musics[this.index_playing - 1]) this.index_playing -= 1;
-      else this.index_playing = this.musics.length - 1;
+      const previous_music = this.played_list.pop();
+      const previous_music_index = this.musics.indexOf(this.musics.find(e => e.id === previous_music));
+      if (previous_music_index > -1) this.index_playing = previous_music_index;
 
       this.initMusic();
     },
     next() {
-      if (this.musics[this.index_playing + 1]) this.index_playing += 1;
-      else this.index_playing = 0;
+      const next_music = this.playing_list.shift();
+      this.played_list.push(this.playingMusic.id);
+
+      this.index_playing = this.musics.indexOf(this.musics.find(e => e.id === next_music));
+      this.playing_list.push(next_music);
 
       this.initMusic();
     },
@@ -291,6 +303,8 @@ export default {
     this.music.volume = 0.2;
 
     this.likes = JSON.parse(localStorage.getItem('liked_songs')) || [];
+
+    this.playing_list = this.musics.map(e => e.id);
   },
 }
 </script>

@@ -82,7 +82,8 @@
                   step=".01"
                   @input="$emit('volumechange', $event)"
                   hide-details
-              ></v-slider>
+                  @scroll="test"
+              />
             </v-col>
           </v-row>
         </v-card-actions>
@@ -166,6 +167,9 @@ export default {
     },
   },
   methods: {
+    test(ev) {
+      console.log(ev)
+    },
     previous() {
       this.nextTrack = false;
       this.$emit('previous');
