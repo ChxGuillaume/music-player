@@ -314,31 +314,4 @@ export default {
 .fade-enter, .fade-leave-to {
   opacity: 0;
 }
-
-.scrolling-text {
-  width: fit-content;
-  min-width: 100%;
-  text-align: left;
-  transition: .5s linear;
-  overflow: visible;
-}
-
-.scrolling-text-container:hover .scrolling-text {
-  animation: linear scroll-text 8s infinite;
-}
-
-@keyframes scroll-text {
-  0% {
-    transform: translate(0%);
-  }
-  55% {
-    transform: translate(-100%);
-  }
-  55.01% {
-    transform: translate(100%);
-  }
-  75% {
-    transform: translate(0%);
-  }
-}
 </style>

@@ -117,8 +117,6 @@ export default {
         const author = e.author.toLowerCase().replace(regex, '');
         const feats = e.feat.join('').toLowerCase().replace(regex, '');
 
-        console.log(title, author, feats)
-
         return ((title.includes(search_input)) || (author.includes(search_input)) || (feats.includes(search_input)))
       });
 
@@ -144,5 +142,33 @@ export default {
 <style scoped>
 .playing {
   background: rgba(33, 150, 243, .24);
+}
+
+.scrolling-text {
+  display: table;
+  width: fit-content;
+  min-width: 100%;
+  text-align: left;
+  transition: .5s linear;
+  overflow: visible;
+}
+
+.scrolling-text-container:hover .scrolling-text {
+  animation: linear scroll-text 8s infinite;
+}
+
+@keyframes scroll-text {
+  0% {
+    transform: translate(0%);
+  }
+  55% {
+    transform: translate(-100%);
+  }
+  55.01% {
+    transform: translate(100%);
+  }
+  75% {
+    transform: translate(0%);
+  }
 }
 </style>
