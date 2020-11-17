@@ -42,6 +42,13 @@
     </v-list>
 
     <template v-slot:append>
+      <v-text-field
+          class="my-2 px-3"
+          v-model="search_input"
+          label="Search"
+          clearable
+          hide-details
+      />
       <v-bottom-navigation
           v-model="sub_menu"
           color="primary"
@@ -90,6 +97,7 @@ export default {
     return {
       menu: false,
       sub_menu: undefined,
+      search_input: ''
     }
   },
   computed: {
@@ -102,11 +110,23 @@ export default {
       }
     },
     displayMusics() {
+      const musics = this.musics.filter(e => {
+        const regex = /[^A-Za-z0-9]/g
+        const search_input = this.search_input.toLowerCase().replace(regex, '');
+        const title = e.title.toLowerCase().replace(regex, '');
+        const author = e.author.toLowerCase().replace(regex, '');
+        const feats = e.feat.join('').toLowerCase().replace(regex, '');
+
+        console.log(title, author, feats)
+
+        return ((title.includes(search_input)) || (author.includes(search_input)) || (feats.includes(search_input)))
+      });
+
       if (this.sub_menu === 'likes') {
-        return this.musics.filter(e => this.likes.includes(e.id))
+        return musics.filter(e => this.likes.includes(e.id))
       }
 
-      return this.musics
+      return musics
     },
   },
   methods: {

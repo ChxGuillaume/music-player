@@ -64,6 +64,14 @@ export default {
       likes: [],
       musics: [
         {
+          id: 0,
+          title: 'VILLAIN',
+          image: 'https://songs.nekotiki.fr/thumbnails/KDA_VILLAIN.jpg',
+          mp3: 'https://songs.nekotiki.fr/musics/KDA_VILLAIN.mp3',
+          author: 'K/DA',
+          feat: ['Madison Beer', 'Kim Petras'],
+        },
+        {
           id: 1,
           title: 'MORE',
           image: 'https://songs.nekotiki.fr/thumbnails/KDA_MORE.jpg',
@@ -158,6 +166,22 @@ export default {
           mp3: 'https://songs.nekotiki.fr/musics/WARRIORS_CINEMATIC.mp3',
           author: 'League of Legends',
           feat: ['2WEI', 'Edda Hayes'],
+        },
+        {
+          id: 13,
+          title: 'DRUM GO DUM',
+          image: 'https://songs.nekotiki.fr/thumbnails/DRUM_GO_DUM.jpg',
+          mp3: 'https://songs.nekotiki.fr/musics/DRUM_GO_DUM.mp3',
+          author: 'League of Legends',
+          feat: ['Aluna', 'Wolftyla', 'Bekuh BOOM'],
+        },
+        {
+          id: 14,
+          title: 'I\'LL SHOW YOU',
+          image: 'https://songs.nekotiki.fr/thumbnails/I-LL_SHOW_YOU.jpg',
+          mp3: 'https://songs.nekotiki.fr/musics/I-LL_SHOW_YOU.mp3',
+          author: 'K/DA',
+          feat: ['TWICE', 'Bekuh BOOM', 'Annika Wells'],
         },
       ],
       music: new Audio(),
@@ -296,6 +320,7 @@ export default {
   min-width: 100%;
   text-align: left;
   transition: .5s linear;
+  overflow: visible;
 }
 
 .scrolling-text-container:hover .scrolling-text {
