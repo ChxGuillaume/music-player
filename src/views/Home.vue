@@ -221,7 +221,7 @@ export default {
       this.music_loading = true;
     },
     selectMusic(id) {
-      const music_index = this.musics.indexOf(this.musics.find(e => e.id === id));
+      const music_index = this.musics.findIndex(e => e.id === id);
 
       if (music_index > -1) {
         this.played_list.push(this.playingMusic.id);
@@ -240,7 +240,9 @@ export default {
     },
     previous() {
       const previous_music = this.played_list.pop();
-      const previous_music_index = this.musics.indexOf(this.musics.find(e => e.id === previous_music));
+      this.playing_list.unshift(this.playingMusic.id);
+
+      const previous_music_index = this.musics.findIndex(e => e.id === previous_music);
       if (previous_music_index > -1) this.index_playing = previous_music_index;
 
       this.initMusic();
@@ -249,8 +251,8 @@ export default {
       const next_music = this.playing_list.shift();
       this.played_list.push(this.playingMusic.id);
 
-      this.index_playing = this.musics.indexOf(this.musics.find(e => e.id === next_music));
-      this.playing_list.push(next_music);
+      this.index_playing = this.musics.findIndex(e => e.id === next_music);
+      if (!this.playing_list.includes(next_music)) this.playing_list.push(next_music);
 
       this.initMusic();
     },
