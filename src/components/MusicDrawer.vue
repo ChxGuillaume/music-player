@@ -26,7 +26,9 @@
           :key="item.id"
           link
           @click="$emit('select-music', item.id)"
-          @click.right="chooseMusic($event, item.id)"
+          @click.right="contextMenu($event, item.id)"
+          :long-press="300"
+          @long-press-start="contextMenu($event, item.id)"
       >
         <v-list-item-icon class="mr-2">
           <v-icon :color="item.id === music_id ? 'primary' : ''">mdi-music-note-eighth</v-icon>
@@ -77,8 +79,13 @@
 </template>
 
 <script>
+import LongPress from 'vue-directive-long-press'
+
 export default {
   name: "MusicDrawer",
+  directives: {
+    'long-press': LongPress
+  },
   props: {
     likes: {
       type: Array,
@@ -131,9 +138,9 @@ export default {
     toggleMenu() {
       this.menu = !this.menu;
     },
-    chooseMusic(ev, id) {
+    contextMenu(ev, id) {
       ev.preventDefault();
-      this.$emit('select-music', id);
+      alert('context menu open ' + id)
     },
   },
 }

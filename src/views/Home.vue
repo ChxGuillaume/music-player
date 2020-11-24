@@ -23,7 +23,7 @@
           :duration="duration"
           :currentTime="current_time"
           :loading="music_loading"
-          @start="initMusic"
+          @start="next"
           @resume="resume"
           @pause="pause"
           @volumechange="volumechange"
