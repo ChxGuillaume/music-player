@@ -34,13 +34,18 @@
           @unlike="unlike"
           @open-drawer="$refs.drawer.toggleMenu()"
       />
-      <MusicShortcuts/>
+      <MusicShortcuts
+          :volume="volume"
+          @volumechange="volumechange"
+      />
       <MusicDrawer
           :likes="likes"
           :musics="musics"
           :music_id="playingMusic.id"
           ref="drawer"
           @select-music="selectMusic"
+          @add-to-queue="addToQueue"
+          @like="likeId"
       />
     </v-container>
   </v-main>
@@ -256,11 +261,18 @@ export default {
 
       this.initMusic();
     },
+    addToQueue(id) {
+      this.playing_list.unshift(id);
+    },
     volumechange(volume) {
       if (this.music) this.music.volume = volume;
     },
     seeking(seek) {
       if (this.music) this.music.currentTime = seek;
+    },
+    likeId(id) {
+      if (!this.likes.includes(id)) this.likes.push(id);
+      this.saveLikes();
     },
     like() {
       if (!this.likes.includes(this.playingMusic.id)) this.likes.push(this.playingMusic.id);

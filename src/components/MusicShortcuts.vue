@@ -136,6 +136,16 @@
               Seek -5 sec
             </v-col>
           </v-row>
+          <v-divider/>
+          <knob-control
+              class="mt-3"
+              :value="knobVolume"
+              text-color="#ffffff"
+              :min="0"
+              :max="100"
+              @input="test"
+          />
+          <p class="mt-3 mb-0 text-caption grey--text">Hidden Knob, We keep design clean here !</p>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -145,6 +155,22 @@
 <script>
 export default {
   name: "MusicShortcuts",
+  props: {
+    volume: {
+      type: Number,
+      required: true
+    }
+  },
+  computed: {
+    knobVolume() {
+      return Math.round(this.volume * 100);
+    }
+  },
+  methods: {
+    test(ev) {
+      this.$emit('volumechange', ev / 100);
+    }
+  }
 }
 </script>
 
