@@ -37,7 +37,7 @@
 
           <v-list-item-content class="scrolling-text-container">
             <v-list-item-title class="scrolling-text">
-              <div>{{ item.title }} <span class="grey--text">by {{ item.author }}</span></div>
+              <div>{{ item.title }} <span class="grey--text">by {{ item.author.name }}</span></div>
               <div class="grey--text" v-if="item.feat.length">ft. {{ item.feat.join(', ') }}</div>
             </v-list-item-title>
           </v-list-item-content>
@@ -103,6 +103,14 @@
           </v-list-item-avatar>
           <v-list-item-title>Like</v-list-item-title>
         </v-list-item>
+        <v-list-item
+            @click="seeArtist"
+        >
+          <v-list-item-avatar>
+            <v-icon>mdi-account-details</v-icon>
+          </v-list-item-avatar>
+          <v-list-item-title>View Artist</v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-bottom-sheet>
   </div>
@@ -153,7 +161,7 @@ export default {
         const regex = /[^A-Za-z0-9]/g
         const search_input = this.search_input.toLowerCase().replace(regex, '');
         const title = e.title.toLowerCase().replace(regex, '');
-        const author = e.author.toLowerCase().replace(regex, '');
+        const author = e.author.name.toLowerCase().replace(regex, '');
         const feats = e.feat.join('').toLowerCase().replace(regex, '');
 
         return ((title.includes(search_input)) || (author.includes(search_input)) || (feats.includes(search_input)))
@@ -187,6 +195,10 @@ export default {
       this.bottom_modal = false;
       this.$emit('like', this.modal_music_id);
     },
+    seeArtist() {
+      this.bottom_modal = false;
+      this.$router.push({ name: 'artists', params: { id: this.musics.find(e => e.id === this.modal_music_id).author.id.toString() } })
+    }
   },
 }
 </script>

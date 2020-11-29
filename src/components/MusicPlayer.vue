@@ -1,12 +1,11 @@
 <template>
-  <v-row class="my-auto">
+  <v-row>
     <v-col>
       <v-card
           :loading="loading"
           class="mx-auto"
           max-width="400"
           elevation="15"
-          style="margin-bottom: 100px;"
       >
         <div style="height: 224px; border-radius: 4px;">
           <transition :name="nextTrack ? 'to-right' : 'to-left'">
@@ -35,7 +34,7 @@
 
         <v-card-text class="text-left text--primary">
           <div class="text-h6">{{ music.title }}</div>
-          <div class="caption grey--text">{{ music.author }}</div>
+          <div class="caption grey--text">{{ music.author.name }}</div>
           <div v-if="music.feat.length" class="caption grey--text">ft. {{ music.feat.join(', ') }}</div>
         </v-card-text>
 

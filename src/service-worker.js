@@ -53,7 +53,7 @@ self.addEventListener('fetch', function(event) {
     console.log('Handling fetch event for', event.request.url);
 
     if (event.request.headers.get('range')) {
-        const pos = Number(/^bytes\=(\d+)\-$/g.exec(event.request.headers.get('range'))[1]);
+        const pos = Number(/^bytes=(\d+)-$/g.exec(event.request.headers.get('range'))[1]);
         console.log('Range request for', event.request.url, ', starting position:', pos);
         event.respondWith(
             caches.open(CACHE_NAME)
